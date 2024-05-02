@@ -1,5 +1,5 @@
 import board.{type Board}
-import chromatic.{blue, bold, red}
+import chromatic.{blue, bold, red, green} 
 import consts.{amount_of_guesses, codepoint_int_a, codepoint_int_z}
 import gleam/int
 import gleam/io
@@ -17,7 +17,7 @@ pub type Game {
     board_3: Board,
     board_4: Board,
     attempts: Int,
-    guessed_all: Bool,
+    all_correct: Bool,
     is_over: Bool,
   )
 }
@@ -177,30 +177,30 @@ fn parse_guess_is_word(
 }
 
 fn make_guess(game: Game, guess: String) {
-  let board_1 = case game.board_1.is_over {
+  let board_1 = case game.board_1.is_correct {
     True -> game.board_1
     False -> board.make_guess(game.board_1, guess)
   }
 
-  let board_2 = case game.board_2.is_over {
+  let board_2 = case game.board_2.is_correct {
     True -> game.board_2
     False -> board.make_guess(game.board_2, guess)
   }
 
-  let board_3 = case game.board_3.is_over {
+  let board_3 = case game.board_3.is_correct {
     True -> game.board_3
     False -> board.make_guess(game.board_3, guess)
   }
 
-  let board_4 = case game.board_4.is_over {
+  let board_4 = case game.board_4.is_correct {
     True -> game.board_4
     False -> board.make_guess(game.board_4, guess)
   }
 
   let attempts = game.attempts + 1
-  let guessed_all =
-    board_1.is_over && board_2.is_over && board_3.is_over && board_4.is_over
-  let is_over = guessed_all || attempts == amount_of_guesses
+  let all_correct =
+    board_1.is_correct && board_2.is_correct && board_3.is_correct && board_4.is_correct
+  let is_over = all_correct || attempts == amount_of_guesses
 
   Game(
     game.possible_words,
@@ -210,15 +210,22 @@ fn make_guess(game: Game, guess: String) {
     board_3,
     board_4,
     attempts,
-    guessed_all,
+    all_correct,
     is_over,
   )
+}
+
+fn answer_is_correct_color(answer: String, is_correct: Bool) {
+  case is_correct {
+    True -> answer |> bold |> green
+    False -> answer |> bold |> red
+  }
 }
 
 fn game_over(game: Game) {
   print(game)
   io.println("")
-  case game.guessed_all {
+  case game.all_correct {
     True -> {
       io.println("Guessed in " <> int.to_string(game.attempts) <> " attempts!")
       io.println(
@@ -232,16 +239,16 @@ fn game_over(game: Game) {
       io.println(
         "The words were: "
         <> game.board_1.answer
-        |> bold
+        |> answer_is_correct_color(game.board_1.is_correct)
         <> ", "
         <> game.board_2.answer
-        |> bold
+        |> answer_is_correct_color(game.board_2.is_correct)
         <> ", "
         <> game.board_3.answer
-        |> bold
+        |> answer_is_correct_color(game.board_3.is_correct)
         <> ", "
         <> game.board_4.answer
-        |> bold
+        |> answer_is_correct_color(game.board_4.is_correct)
         <> ".",
       )
       io.println("Better luck next time.")

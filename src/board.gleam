@@ -4,7 +4,7 @@ import gleam/list
 import row.{type Row}
 
 pub type Board {
-  Board(answer: String, rows: List(Row), is_over: Bool)
+  Board(answer: String, rows: List(Row), is_correct: Bool)
 }
 
 pub fn new(word: String) {
@@ -31,7 +31,7 @@ pub fn make_guess(board: Board, guess: String) {
       }
     })
 
-  let is_over = guess == board.answer
+  let is_correct = guess == board.answer
 
-  Board(board.answer, rows, is_over)
+  Board(board.answer, rows, is_correct)
 }
