@@ -38,10 +38,10 @@ pub fn new(possible_words: List(String), valid_words: List(String)) {
 
   // TODO ensure picked words are unique
 
-  io.debug(answer_1)
-  io.debug(answer_2)
-  io.debug(answer_3)
-  io.debug(answer_4)
+  // io.debug(answer_1)
+  // io.debug(answer_2)
+  // io.debug(answer_3)
+  // io.debug(answer_4)
 
   Game(
     possible_words,
