@@ -12,7 +12,7 @@ pub type Row {
 }
 
 pub fn new() {
-  let cells = build_list([], cell.new, word_size)
+  let cells = build_list(cell.new, word_size)
   Row("", cells)
 }
 

@@ -29,8 +29,8 @@ type GuessError {
 }
 
 pub fn new(possible_words: List(String), valid_words: List(String)) {
-  let amount_of_boards = 6
-  let boards = build_list([], board.new(valid_words), amount_of_boards)
+  let amount_of_boards = 4
+  let boards = build_list(board.new(valid_words), amount_of_boards)
   Game(possible_words, valid_words, boards, 0, False, False)
 }
 

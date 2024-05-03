@@ -11,7 +11,7 @@ pub type Board {
 pub fn new(valid_words: List(String)) {
   fn() {
     let answer = pick_answer(valid_words)
-    let rows = build_list([], row.new, amount_of_guesses)
+    let rows = build_list(row.new, amount_of_guesses)
     Board(answer, rows, False)
   }
 }
@@ -36,7 +36,7 @@ pub fn concat_strings(board_a: Board, board_b: Board) {
 }
 
 pub fn many_to_strings(boards: List(Board)) {
-  let strings = build_list([], fn() { "" }, amount_of_guesses)
+  let strings = build_list(fn() { "" }, amount_of_guesses)
   let #(strings, _) =
     list.map_fold(boards, strings, fn(strings, board) {
       let rows_str =
