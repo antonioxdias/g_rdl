@@ -1,5 +1,6 @@
 import board.{type Board}
-import chromatic.{blue, bold, red, green} 
+import build_list.{build_list}
+import chromatic.{blue, bold, green, red}
 import consts.{amount_of_guesses, codepoint_int_a, codepoint_int_z}
 import gleam/int
 import gleam/io
@@ -12,10 +13,7 @@ pub type Game {
   Game(
     possible_words: List(String),
     valid_words: List(String),
-    board_1: Board,
-    board_2: Board,
-    board_3: Board,
-    board_4: Board,
+    boards: List(Board),
     attempts: Int,
     all_correct: Bool,
     is_over: Bool,
@@ -31,36 +29,9 @@ type GuessError {
 }
 
 pub fn new(possible_words: List(String), valid_words: List(String)) {
-  let answer_1 = pick_answer(valid_words)
-  let answer_2 = pick_answer(valid_words)
-  let answer_3 = pick_answer(valid_words)
-  let answer_4 = pick_answer(valid_words)
-
-  // TODO ensure picked words are unique
-
-  // io.debug(answer_1)
-  // io.debug(answer_2)
-  // io.debug(answer_3)
-  // io.debug(answer_4)
-
-  Game(
-    possible_words,
-    valid_words,
-    board.new(answer_1),
-    board.new(answer_2),
-    board.new(answer_3),
-    board.new(answer_4),
-    0,
-    False,
-    False,
-  )
-}
-
-fn pick_answer(valid_words: List(String)) {
-  let max = list.length(valid_words) - 1
-  let index = int.random(max)
-  let assert Ok(answer) = list.at(valid_words, index)
-  answer
+  let amount_of_boards = 6
+  let boards = build_list([], board.new(valid_words), amount_of_boards)
+  Game(possible_words, valid_words, boards, 0, False, False)
 }
 
 pub fn loop(game: Game) {
@@ -114,13 +85,9 @@ pub fn loop(game: Game) {
 }
 
 fn print(game: Game) {
-  let top_boards_strings = board.concat_strings(game.board_1, game.board_2)
-  let bottom_boards_strings = board.concat_strings(game.board_3, game.board_4)
-
   io.println("")
-  list.each(top_boards_strings, io.println)
+  list.each(board.many_to_strings(game.boards), io.println)
   io.println("\n")
-  list.each(bottom_boards_strings, io.println)
 }
 
 fn parse_guess(game: Game, guess: String) -> Result(String, GuessError) {
@@ -177,38 +144,25 @@ fn parse_guess_is_word(
 }
 
 fn make_guess(game: Game, guess: String) {
-  let board_1 = case game.board_1.is_correct {
-    True -> game.board_1
-    False -> board.make_guess(game.board_1, guess)
-  }
-
-  let board_2 = case game.board_2.is_correct {
-    True -> game.board_2
-    False -> board.make_guess(game.board_2, guess)
-  }
-
-  let board_3 = case game.board_3.is_correct {
-    True -> game.board_3
-    False -> board.make_guess(game.board_3, guess)
-  }
-
-  let board_4 = case game.board_4.is_correct {
-    True -> game.board_4
-    False -> board.make_guess(game.board_4, guess)
-  }
+  let boards =
+    list.map(game.boards, fn(game_board) {
+      case game_board.is_correct {
+        True -> game_board
+        False -> board.make_guess(game_board, guess)
+      }
+    })
 
   let attempts = game.attempts + 1
   let all_correct =
-    board_1.is_correct && board_2.is_correct && board_3.is_correct && board_4.is_correct
+    list.fold(boards, True, fn(acc, game_board) {
+      acc && game_board.is_correct
+    })
   let is_over = all_correct || attempts == amount_of_guesses
 
   Game(
     game.possible_words,
     game.valid_words,
-    board_1,
-    board_2,
-    board_3,
-    board_4,
+    boards,
     attempts,
     all_correct,
     is_over,
@@ -217,8 +171,14 @@ fn make_guess(game: Game, guess: String) {
 
 fn answer_is_correct_color(answer: String, is_correct: Bool) {
   case is_correct {
-    True -> answer |> bold |> green
-    False -> answer |> bold |> red
+    True ->
+      answer
+      |> bold
+      |> green
+    False ->
+      answer
+      |> bold
+      |> red
   }
 }
 
@@ -238,18 +198,12 @@ fn game_over(game: Game) {
     False -> {
       io.println(
         "The words were: "
-        <> game.board_1.answer
-        |> answer_is_correct_color(game.board_1.is_correct)
-        <> ", "
-        <> game.board_2.answer
-        |> answer_is_correct_color(game.board_2.is_correct)
-        <> ", "
-        <> game.board_3.answer
-        |> answer_is_correct_color(game.board_3.is_correct)
-        <> ", "
-        <> game.board_4.answer
-        |> answer_is_correct_color(game.board_4.is_correct)
-        <> ".",
+        <> list.map(game.boards, fn(game_board) {
+          game_board.answer
+          |> answer_is_correct_color(game_board.is_correct)
+        })
+        |> string.join(", ")
+        <> "."
       )
       io.println("Better luck next time.")
     }
