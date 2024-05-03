@@ -13,6 +13,7 @@ pub type Game {
   Game(
     possible_words: List(String),
     valid_words: List(String),
+    amount_of_boards: Int,
     boards: List(Board),
     attempts: Int,
     all_correct: Bool,
@@ -28,10 +29,13 @@ type GuessError {
   UnknownWord
 }
 
-pub fn new(possible_words: List(String), valid_words: List(String)) {
-  let amount_of_boards = 4
+pub fn new(
+  possible_words: List(String),
+  valid_words: List(String),
+  amount_of_boards,
+) {
   let boards = build_list(board.new(valid_words), amount_of_boards)
-  Game(possible_words, valid_words, boards, 0, False, False)
+  Game(possible_words, valid_words, amount_of_boards, boards, 0, False, False)
 }
 
 pub fn loop(game: Game) {
@@ -154,14 +158,13 @@ fn make_guess(game: Game, guess: String) {
 
   let attempts = game.attempts + 1
   let all_correct =
-    list.fold(boards, True, fn(acc, game_board) {
-      acc && game_board.is_correct
-    })
+    list.fold(boards, True, fn(acc, game_board) { acc && game_board.is_correct })
   let is_over = all_correct || attempts == amount_of_guesses
 
   Game(
     game.possible_words,
     game.valid_words,
+    game.amount_of_boards,
     boards,
     attempts,
     all_correct,
@@ -203,11 +206,14 @@ fn game_over(game: Game) {
           |> answer_is_correct_color(game_board.is_correct)
         })
         |> string.join(", ")
-        <> "."
+        <> ".",
       )
       io.println("Better luck next time.")
     }
   }
-  io.println("")
-  io.println("Press ctrl + c to exit")
+  exit_message()
+}
+
+pub fn exit_message() {
+  io.println("\nPress ctrl + c to exit")
 }
