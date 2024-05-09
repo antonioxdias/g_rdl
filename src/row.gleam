@@ -1,4 +1,4 @@
-import utils.{build_list}
+import utils.{build_list, fold2}
 import cell.{type Cell}
 import consts.{word_size}
 import gleam/dict
@@ -41,11 +41,8 @@ pub fn make_guess(answer: String, guess: String) {
   }
 
   // Look for correct chars
-  let #(cells, char_counts) =
-    guess_chars
-    |> list.index_fold(#([], char_counts), fn(acc, guess_char, i) {
+  let #(cells, char_counts) = fold2(guess_chars, answer_chars, #([], char_counts), fn(acc, guess_char, answer_char) {
       let #(cells, char_counts) = acc
-      let assert Ok(answer_char) = list.at(answer_chars, i)
 
       let #(cell, char_counts) = case guess_char == answer_char {
         True -> #(
