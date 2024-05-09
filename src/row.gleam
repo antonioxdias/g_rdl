@@ -1,4 +1,3 @@
-import utils.{build_list, fold2}
 import cell.{type Cell}
 import consts.{word_size}
 import gleam/dict
@@ -6,6 +5,7 @@ import gleam/list
 import gleam/option
 import gleam/result
 import gleam/string
+import utils.{build_list, fold2}
 
 pub type Row {
   Row(guess: String, cells: List(Cell))
@@ -41,20 +41,26 @@ pub fn make_guess(answer: String, guess: String) {
   }
 
   // Look for correct chars
-  let #(cells, char_counts) = fold2(guess_chars, answer_chars, #([], char_counts), fn(acc, guess_char, answer_char) {
-      let #(cells, char_counts) = acc
+  let #(cells, char_counts) =
+    fold2(
+      guess_chars,
+      answer_chars,
+      #([], char_counts),
+      fn(acc, guess_char, answer_char) {
+        let #(cells, char_counts) = acc
 
-      let #(cell, char_counts) = case guess_char == answer_char {
-        True -> #(
-          cell.Correct(guess_char),
-          update_char_counts(char_counts, guess_char),
-        )
-        False -> #(cell.Wrong(guess_char), char_counts)
-      }
+        let #(cell, char_counts) = case guess_char == answer_char {
+          True -> #(
+            cell.Correct(guess_char),
+            update_char_counts(char_counts, guess_char),
+          )
+          False -> #(cell.Wrong(guess_char), char_counts)
+        }
 
-      let cells = list.concat([cells, [cell]])
-      #(cells, char_counts)
-    })
+        let cells = list.concat([cells, [cell]])
+        #(cells, char_counts)
+      },
+    )
 
   // Look for possible chars
   let #(cells, _) =

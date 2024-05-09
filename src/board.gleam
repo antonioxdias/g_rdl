@@ -1,9 +1,8 @@
-import utils.{build_list}
 import consts.{amount_of_guesses}
 import gleam/int
 import gleam/list
-import gleam/io
 import row.{type Row}
+import utils.{build_list}
 
 pub type Board {
   Board(answer: String, rows: List(Row), is_correct: Bool)
@@ -12,6 +11,7 @@ pub type Board {
 pub fn new(valid_words: List(String)) {
   fn() {
     let answer = pick_answer(valid_words)
+    // io.debug(answer)
     let rows = build_list(row.new, amount_of_guesses)
     Board(answer, rows, False)
   }
@@ -21,9 +21,14 @@ fn pick_answer(valid_words: List(String)) {
   let max = list.length(valid_words) - 1
   let index = int.random(max)
 
-  let assert Ok(answer) = list.at(valid_words, index)
-  // TODO ensure picked answer is unique
-  io.debug(answer)
+  let answer =
+    list.fold_until(valid_words, "0", fn(i, word) {
+      let assert Ok(cur_index) = int.parse(i)
+      case cur_index == index {
+        True -> list.Stop(word)
+        False -> list.Continue(int.to_string(cur_index + 1))
+      }
+    })
   answer
 }
 

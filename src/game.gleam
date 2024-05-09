@@ -1,5 +1,4 @@
 import board.{type Board}
-import utils.{build_list}
 import chromatic.{blue, bold, green, red}
 import consts.{amount_of_guesses, codepoint_int_a, codepoint_int_z}
 import gleam/int
@@ -8,6 +7,7 @@ import gleam/list
 import gleam/result
 import gleam/string
 import question.{question}
+import utils.{build_list}
 
 pub type Game {
   Game(
