@@ -1,4 +1,4 @@
-import build_list.{build_list}
+import utils.{build_list}
 import cell.{type Cell}
 import consts.{word_size}
 import gleam/dict

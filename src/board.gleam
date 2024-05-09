@@ -1,7 +1,8 @@
-import build_list.{build_list}
+import utils.{build_list}
 import consts.{amount_of_guesses}
 import gleam/int
 import gleam/list
+import gleam/io
 import row.{type Row}
 
 pub type Board {
@@ -19,9 +20,15 @@ pub fn new(valid_words: List(String)) {
 fn pick_answer(valid_words: List(String)) {
   let max = list.length(valid_words) - 1
   let index = int.random(max)
+
+  // let x = fold2(["a1", "a2", "a3", "a4"], ["b1", "b2", "b3"], "", fn(acc, a, b) {
+  //   acc <> ", " <> a <> b
+  // })
+  // io.debug(x)
+
   let assert Ok(answer) = list.at(valid_words, index)
   // TODO ensure picked answer is unique
-  // io.debug(answer)
+  io.debug(answer)
   answer
 }
 

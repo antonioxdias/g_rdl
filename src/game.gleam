@@ -1,5 +1,5 @@
 import board.{type Board}
-import build_list.{build_list}
+import utils.{build_list}
 import chromatic.{blue, bold, green, red}
 import consts.{amount_of_guesses, codepoint_int_a, codepoint_int_z}
 import gleam/int
