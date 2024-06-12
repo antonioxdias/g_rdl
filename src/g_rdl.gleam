@@ -12,9 +12,14 @@ fn words_from_file(path: String) {
   string.split(words, "\n")
 }
 
-fn load_amount_of_boards() {
+fn load_amount_of_boards() -> Result(Int, Nil) {
   case argv.load().arguments {
-    [value] -> int.parse(value)
+    [value] -> {
+      case int.parse(value) {
+        Ok(amount) if amount > 0 -> Ok(amount)
+        _ -> Error(Nil)
+      }
+    }
     [_, ..] -> Error(Nil)
     _ -> Ok(default_amount_of_boards)
   }
