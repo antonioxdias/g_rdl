@@ -1,4 +1,5 @@
 import gleam/int
+import gleam/io
 import gleam/list
 import row.{type Row}
 import utils.{build_list}
@@ -41,7 +42,7 @@ pub fn concat_strings(board_a: Board, board_b: Board) {
   })
 }
 
-pub fn many_to_strings(boards: List(Board), amount_of_guesses: Int) {
+pub fn print_many(boards: List(Board), amount_of_guesses: Int) {
   let strings = build_list(fn() { "" }, amount_of_guesses)
   let #(strings, _) =
     list.map_fold(boards, strings, fn(strings, board) {
@@ -54,7 +55,10 @@ pub fn many_to_strings(boards: List(Board), amount_of_guesses: Int) {
         })
       #(rows_str, board)
     })
-  strings
+
+  io.println("")
+  list.each(strings, io.println)
+  io.println("\n")
 }
 
 pub fn make_guess(board: Board, guess: String) {

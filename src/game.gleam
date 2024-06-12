@@ -1,6 +1,9 @@
 import board.{type Board}
 import chromatic.{blue, bold, green, red}
-import consts.{base_amount_of_guesses, codepoint_int_a, codepoint_int_z}
+import consts.{
+  base_amount_of_guesses, codepoint_int_a, codepoint_int_z,
+  print_amount_boards_per_line,
+}
 import gleam/int
 import gleam/io
 import gleam/list
@@ -36,7 +39,6 @@ pub fn new(
   amount_of_boards: Int,
 ) {
   let amount_of_guesses = base_amount_of_guesses + amount_of_boards - 1
-  io.debug(amount_of_guesses)
   let boards =
     build_list(board.new(valid_words, amount_of_guesses), amount_of_boards)
   Game(
@@ -102,12 +104,10 @@ pub fn loop(game: Game) {
 }
 
 fn print(game: Game) {
-  io.println("")
-  list.each(
-    board.many_to_strings(game.boards, game.amount_of_guesses),
-    io.println,
-  )
-  io.println("\n")
+  let chunks = list.sized_chunk(game.boards, print_amount_boards_per_line)
+  list.each(chunks, fn(chunk) {
+    board.print_many(chunk, game.amount_of_guesses)
+  })
 }
 
 fn parse_guess(game: Game, guess: String) -> Result(String, GuessError) {
