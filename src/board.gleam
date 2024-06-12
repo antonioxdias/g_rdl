@@ -1,4 +1,3 @@
-import consts.{amount_of_guesses}
 import gleam/int
 import gleam/list
 import row.{type Row}
@@ -8,7 +7,7 @@ pub type Board {
   Board(answer: String, rows: List(Row), is_correct: Bool)
 }
 
-pub fn new(valid_words: List(String)) {
+pub fn new(valid_words: List(String), amount_of_guesses: Int) {
   fn() {
     let answer = pick_answer(valid_words)
     // io.debug(answer)
@@ -42,7 +41,7 @@ pub fn concat_strings(board_a: Board, board_b: Board) {
   })
 }
 
-pub fn many_to_strings(boards: List(Board)) {
+pub fn many_to_strings(boards: List(Board), amount_of_guesses: Int) {
   let strings = build_list(fn() { "" }, amount_of_guesses)
   let #(strings, _) =
     list.map_fold(boards, strings, fn(strings, board) {

@@ -1,6 +1,6 @@
 import board.{type Board}
 import chromatic.{blue, bold, green, red}
-import consts.{amount_of_guesses, codepoint_int_a, codepoint_int_z}
+import consts.{base_amount_of_guesses, codepoint_int_a, codepoint_int_z}
 import gleam/int
 import gleam/io
 import gleam/list
@@ -15,6 +15,7 @@ pub type Game {
     valid_words: List(String),
     amount_of_boards: Int,
     boards: List(Board),
+    amount_of_guesses: Int,
     attempts: Int,
     all_correct: Bool,
     is_over: Bool,
@@ -32,10 +33,22 @@ type GuessError {
 pub fn new(
   possible_words: List(String),
   valid_words: List(String),
-  amount_of_boards,
+  amount_of_boards: Int,
 ) {
-  let boards = build_list(board.new(valid_words), amount_of_boards)
-  Game(possible_words, valid_words, amount_of_boards, boards, 0, False, False)
+  let amount_of_guesses = base_amount_of_guesses + amount_of_boards - 1
+  io.debug(amount_of_guesses)
+  let boards =
+    build_list(board.new(valid_words, amount_of_guesses), amount_of_boards)
+  Game(
+    possible_words,
+    valid_words,
+    amount_of_boards,
+    boards,
+    amount_of_guesses,
+    0,
+    False,
+    False,
+  )
 }
 
 pub fn loop(game: Game) {
@@ -90,7 +103,10 @@ pub fn loop(game: Game) {
 
 fn print(game: Game) {
   io.println("")
-  list.each(board.many_to_strings(game.boards), io.println)
+  list.each(
+    board.many_to_strings(game.boards, game.amount_of_guesses),
+    io.println,
+  )
   io.println("\n")
 }
 
@@ -159,16 +175,14 @@ fn make_guess(game: Game, guess: String) {
   let attempts = game.attempts + 1
   let all_correct =
     list.fold(boards, True, fn(acc, game_board) { acc && game_board.is_correct })
-  let is_over = all_correct || attempts == amount_of_guesses
+  let is_over = all_correct || attempts == game.amount_of_guesses
 
   Game(
-    game.possible_words,
-    game.valid_words,
-    game.amount_of_boards,
-    boards,
-    attempts,
-    all_correct,
-    is_over,
+    ..game,
+    boards: boards,
+    attempts: attempts,
+    all_correct: all_correct,
+    is_over: is_over,
   )
 }
 

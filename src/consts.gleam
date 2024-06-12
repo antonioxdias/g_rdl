@@ -6,7 +6,7 @@ pub const word_size = 5
 
 pub const default_amount_of_boards = 4
 
-pub const amount_of_guesses = 9
+pub const base_amount_of_guesses = 6
 
 pub const codepoint_int_a = 97
 
